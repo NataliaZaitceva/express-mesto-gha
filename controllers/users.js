@@ -16,7 +16,7 @@ module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
-    .then((newUser) => res.status(200).send({ data: newUser }))
+    .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
@@ -27,8 +27,8 @@ module.exports.createUser = (req, res) => {
 };
 
 module.exports.getUserById = (req, res) => {
-  User.findById(req.params.userId)
-    .then((userId) => res.status(200).send({ data: userId }))
+  User.findById(req.params.id)
+    .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
@@ -41,8 +41,8 @@ module.exports.getUserById = (req, res) => {
 module.exports.updateProfile = (req, res) => {
   const { name, about } = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true })
-    .then((updateUser) => res.status(200).send({ data: updateUser }))
+  User.findByIdAndUpdate(req.user._id, { name, about })
+    .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
@@ -55,8 +55,8 @@ module.exports.updateProfile = (req, res) => {
 module.exports.updateAvatar = (req, res) => {
   const { avatar } = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true })
-    .then((updateUser) => res.status(200).send({ data: updateUser }))
+  User.findByIdAndUpdate(req.user._id, { avatar })
+    .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
