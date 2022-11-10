@@ -40,7 +40,6 @@ module.exports.likeCard = (req, res) => Card.findById(
   { $addToSet: { likes: req.user._id } },
   { new: true },
 )
-  .orFail(() => { throw new Error('Пользватель по указанному Id не найден'); })
   .then((user) => res.status(200).send({ data: user }))
   .catch((err) => {
     if (err.name === 'ValidationError') {
@@ -53,7 +52,6 @@ module.exports.dislikeCard = (req, res) => Card.findById(
   { $pull: { likes: req.user._id } },
   { new: true },
 )
-  .orFail(() => { throw new Error('Пользватель по указанному Id не найден'); })
   .then((user) => res.status(200).send({ data: user }))
   .catch((err) => {
     if (err.name === 'ValidationError') {

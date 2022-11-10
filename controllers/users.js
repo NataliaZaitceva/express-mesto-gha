@@ -32,7 +32,7 @@ module.exports.getUserById = (req, res) => {
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(500).send({ message: 'Передан невалидный id пользователя' });
+        res.status(400).send({ message: 'Передан невалидный id пользователя' });
       } else if (err.statusCode === 404) {
         res.status(404).send({ message: err.message });
       } else {
@@ -49,7 +49,7 @@ module.exports.updateProfile = (req, res) => {
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(500).send({ message: 'Передан невалидный id пользователя' });
+        res.status(400).send({ message: 'Передан невалидный id пользователя' });
       } else if (err.statusCode === 404) {
         res.status(404).send({ message: err.message });
       } else {
@@ -66,7 +66,7 @@ module.exports.updateAvatar = (req, res) => {
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(500).send({ message: 'Передан невалидный id пользователя' });
+        res.status(400).send({ message: 'Передан невалидный id пользователя' });
       } else if (err.statusCode === 404) {
         res.status(404).send({ message: err.message });
       } else {
