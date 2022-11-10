@@ -16,10 +16,10 @@ module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => res.status(200).send({ data: user }, req.user._id))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
+        res.status(404).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
       } else {
         res.status(500).send({ message: 'Произошла ошибка' });
       }
@@ -28,20 +28,20 @@ module.exports.createUser = (req, res) => {
 
 module.exports.getUserById = (req, res) => {
   User.findById(req.params.id)
+    .orFail(() => { throw new Error('Пользватель по указанному Id не найден'); })
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
-      } else {
-        res.status(500).send({ message: 'Произошла ошибка' });
+        res.status(500).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
       }
     });
 };
 
 module.exports.updateProfile = (req, res) => {
-  const { name, about } = req.body;
+  const { user: { _id }, body } = req;
 
-  User.findByIdAndUpdate(req.user._id, { name, about })
+  User.findByIdAndUpdate(_id, body, { new: true, runValidators: true })
+    .orFail(() => { throw new Error('Пользватель по указанному Id не найден'); })
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -55,7 +55,8 @@ module.exports.updateProfile = (req, res) => {
 module.exports.updateAvatar = (req, res) => {
   const { avatar } = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { avatar })
+  User.findByIdAndUpdate(req.params.id, { avatar }, { new: true })
+    .orFail(() => { throw new Error('Пользватель по указанному Id не найден'); })
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
