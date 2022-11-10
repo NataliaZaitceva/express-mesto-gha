@@ -32,7 +32,11 @@ module.exports.getUserById = (req, res) => {
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(500).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
+        res.status(500).send({ message: 'Передан невалидный id пользователя' });
+      } else if (err.statusCode === 404) {
+        res.status(404).send({ message: err.message });
+      } else {
+        res.status(500).send({ message: 'Произошла ошибка' });
       }
     });
 };
@@ -45,7 +49,9 @@ module.exports.updateProfile = (req, res) => {
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
+        res.status(500).send({ message: 'Передан невалидный id пользователя' });
+      } else if (err.statusCode === 404) {
+        res.status(404).send({ message: err.message });
       } else {
         res.status(500).send({ message: 'Произошла ошибка' });
       }
@@ -60,7 +66,9 @@ module.exports.updateAvatar = (req, res) => {
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
+        res.status(500).send({ message: 'Передан невалидный id пользователя' });
+      } else if (err.statusCode === 404) {
+        res.status(404).send({ message: err.message });
       } else {
         res.status(500).send({ message: 'Произошла ошибка' });
       }
