@@ -61,7 +61,7 @@ module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
   });
 
 module.exports.dislikeCard = (res, req) => {
-  Card.findById(
+  Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
@@ -69,10 +69,10 @@ module.exports.dislikeCard = (res, req) => {
     .orFail(() => {
       throw new Error('NotFound');
     })
-    .then((card) => res.send({ data: card }))
+    .then((cards) => res.status(200).send({ data: cards }))
     .catch((err) => {
       if (err.message === 'NotFound') {
-        return res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
+        return res.status(400).send({ message: 'Передан несуществующий _id карточки.' });
       }
       if (err.name === 'ValidationError') {
         return res.status(400).send({ message: 'Произошла ошибка' });
