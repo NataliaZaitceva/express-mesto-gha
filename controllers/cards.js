@@ -2,7 +2,7 @@ const Card = require('../models/card');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
-    .then((cards) => res.status(200).send({ data: cards }))
+    .then((cards) => res.status(200).send({ data: cards }, req.user._id))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
@@ -45,12 +45,17 @@ module.exports.likeCard = (res, req) => Card.findById(
     }
   });
 
-module.exports.dislikeCard = (res, req) => Card.findById(
+module.exports.dislikeCard = (res, req) => Card.findByIdAndUpdate(
   req.params.cardId,
   { $pull: { likes: req.user._id } },
   { new: true },
 )
-  .then((user) => res.status(200).send(req.params.cardId, { data: user }))
+  .then((cards) => {
+    if (!cards) {
+      return res.status(404).send({ message: 'Объект не найден' });
+    }
+    return res.status(200).send({ data: cards });
+  })
   .catch((err) => {
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
