@@ -31,13 +31,12 @@ module.exports.getUserById = (req, res) => {
     .then((user) => {
       if (!user) {
         res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
-      } else {
-        res.status(200).send({ data: user });
       }
+      return res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
+        res.status(400).send({ message: 'Ошибка' });
       } else { res.status(500).send({ message: 'На сервере произошла ошибка' }); }
     });
 };
