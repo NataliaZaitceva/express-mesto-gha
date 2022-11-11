@@ -68,7 +68,7 @@ module.exports.dislikeCard = (res, req) => {
   )
     .then((cards) => {
       if (!cards) {
-        res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
+        res.status(400).send({ message: 'Передан несуществующий _id карточки.' });
       }
       res.status(200).send({ data: cards });
     })
