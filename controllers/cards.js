@@ -26,7 +26,7 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.deleteCardById = (req, res) => Card.findByIdAndRemove(req.params.cardId)
-  .then((cards) => res.send({ data: cards }))
+  .then((cards) => res.status(200).send(req.params.cardId, { data: cards }))
   .catch((err) => {
     if (err.name === 'ValidationError') {
       return res.status(400).send({ message: 'Ошибка обработки данных' });
@@ -38,7 +38,7 @@ module.exports.likeCard = (res, req) => Card.findById(
   { $addToSet: { likes: req.user._id } },
   { new: true },
 )
-  .then((user) => res.status(200).send({ data: user }))
+  .then((user) => res.status(200).send(req.user._id, { data: user }))
   .catch((err) => {
     if (err.name === 'ValidationError') {
       res.status(500).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
@@ -50,9 +50,9 @@ module.exports.dislikeCard = (res, req) => Card.findById(
   { $pull: { likes: req.user._id } },
   { new: true },
 )
-  .then((user) => res.status(200).send({ data: user }))
+  .then((user) => res.status(200).send(req.params.cardId, { data: user }))
   .catch((err) => {
     if (err.name === 'ValidationError') {
-      res.status(500).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
+      res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
     }
   });

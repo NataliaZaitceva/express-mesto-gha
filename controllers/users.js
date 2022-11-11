@@ -27,9 +27,9 @@ module.exports.createUser = (req, res) => {
 };
 
 module.exports.getUserById = (res, req) => {
-  User.findById(req.params.id)
-    .orFail(() => { throw new Error('Пользватель по указанному Id не найден'); })
+  User.findById(req.params.userId)
     .then((user) => res.status(200).send({ data: user }))
+    .orFail(() => { throw new Error('Пользватель по указанному Id не найден'); })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Передан невалидный id пользователя' });
