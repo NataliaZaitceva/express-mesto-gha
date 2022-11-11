@@ -26,6 +26,22 @@ module.exports.createUser = (req, res) => {
     });
 };
 
+module.exports.getUserById = (req, res) => {
+  User.findById(req.params.userId)
+    .then((user) => {
+      if (user) {
+        res.status(200).send({ data: user });
+      } else {
+        res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
+      }
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
+      } else { res.status(500).send({ message: 'На сервере произошла ошибка' }); }
+    });
+};
+
 module.exports.updateProfile = (req, res) => {
   const { name, about } = req.body;
 
@@ -38,7 +54,7 @@ module.exports.updateProfile = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(404).send({ message: 'Переданы некорректные данные при редактировании пользователя' });
+        res.status(400).send({ message: 'Переданы некорректные данные при редактировании пользователя' });
       } else if (err.name === 'CastError') {
         res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
       }
@@ -60,7 +76,7 @@ module.exports.updateAvatar = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
       } else if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
+        res.status(400).send({ message: 'Пользователь с указанным _id не найден.' });
       }
       res.status(500).send({ message: 'Произошла ошибка сервера' });
     });
