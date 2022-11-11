@@ -29,11 +29,16 @@ module.exports.deleteCard = (req, res) => Card.findByIdAndRemove(req.params.card
   })
   .then((card) => res.send({ data: card }))
   .catch((err) => {
-    if (err.name === 'CastError') {
-      res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
-    } else {
-      res.status(500).send({ message: 'Произошла ошибка сервера' });
+    if (err.message === 'NotFound') {
+      return res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
     }
+    if (err.name === 'ValidationError') {
+      return res.status(400).send({ message: 'Произошла ошибка' });
+    }
+    if (err.name === 'CastError') {
+      return res.status(400).send({ message: 'Произошла ошибка' });
+    }
+    return res.status(500).send({ message: 'Произошла ошибка сервера' });
   });
 
 module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
