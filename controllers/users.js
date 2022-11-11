@@ -26,24 +26,6 @@ module.exports.createUser = (req, res) => {
     });
 };
 
-module.exports.getUserById = (req, res) => {
-  User.findById(req.params.userId)
-    .then((user) => {
-      if (user) {
-        res.status(200).send({ data: user });
-      } else {
-        res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
-      }
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
-      } else {
-        res.status(500).send({ message: 'На сервере произошла ошибка' });
-      }
-    });
-};
-
 module.exports.updateProfile = (req, res) => {
   const { name, about } = req.body;
 
