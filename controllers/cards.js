@@ -34,7 +34,9 @@ module.exports.deleteCard = (req, res) => Card.findByIdAndRemove(req.params.card
   .catch((err) => {
     if (err.name === 'CastError') {
       res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
-    } return res.status(500).send({ message: 'Произошла ошибка сервера' });
+    } else {
+      res.status(500).send({ message: 'Произошла ошибка сервера' });
+    }
   });
 
 module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
@@ -51,8 +53,6 @@ module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
   .catch((err) => {
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
-    } else {
-      res.status(500).send({ message: 'Произошла ошибка сервера' });
     }
   });
 
