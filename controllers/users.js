@@ -58,7 +58,7 @@ module.exports.updateProfile = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные при редактировании пользователя' });
       } else if (err.name === 'CastError') {
-        res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}`});
+        res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
       }
       res.status(500).send({ message: 'Произошла ошибка сервера' });
     });
