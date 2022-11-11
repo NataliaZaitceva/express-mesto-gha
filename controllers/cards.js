@@ -26,11 +26,7 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.deleteCardById = (req, res) => Card.findByIdAndRemove(req.params.cardId)
-  .then((cards) => {
-    if (!cards) {
-      return res.status(400).send({ message: 'Объект не найден' });
-    } return res.send({ data: cards });
-  })
+  .then((cards) => res.send({ data: cards }))
   .catch((err) => {
     if (err.name === 'ValidationError') {
       return res.status(400).send({ message: 'Ошибка обработки данных' });
