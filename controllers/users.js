@@ -36,8 +36,10 @@ module.exports.getUserById = (req, res) => {
       }
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(500).send({ message: 'Произошла ошибка сервера' });
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
+      } else {
+        res.status(500).send({ message: 'На сервере произошла ошибка' });
       }
     });
 };
