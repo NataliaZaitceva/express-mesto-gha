@@ -7,7 +7,7 @@ module.exports.getUsers = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
       } else {
-        res.status(500).send({ message: 'Произошла ошибка' });
+        res.status(500).send({ message: 'Произошла ошибка сервера' });
       }
     });
 };
@@ -28,13 +28,16 @@ module.exports.createUser = (req, res) => {
 
 module.exports.getUserById = (req, res) => {
   User.findById(req.params.userId)
-    .then((user) => res.status(200).send({ data: user }))
-    .orFail(() => { throw new Error('Пользватель по указанному Id не найден'); })
+    .then((user) => {
+      if (user) {
+        res.status(200).send({ data: user });
+      } else {
+        res.status(404).send({ message: 'Ошибка. Пользователь не найден, попробуйте еще раз' });
+      }
+    })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Передан невалидный id пользователя' });
-      } else if (err.statusCode === 404) {
-        res.status(404).send({ message: err.message });
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
       } else {
         res.status(500).send({ message: 'Произошла ошибка сервера' });
       }
@@ -55,9 +58,9 @@ module.exports.updateProfile = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Переданы некорректные данные при редактировании пользователя' });
       } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Пользователь по указанному _id не найден.' });
+        res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}`});
       }
-      res.status(500).send({ message: 'На сервере произошла ошибка' });
+      res.status(500).send({ message: 'Произошла ошибка сервера' });
     });
 };
 
@@ -73,10 +76,10 @@ module.exports.updateAvatar = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при редактировании пользователя' });
+        res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
       } else if (err.name === 'CastError') {
         res.status(400).send({ message: 'Пользователь по указанному _id не найден.' });
       }
-      res.status(500).send({ message: 'На сервере произошла ошибка' });
+      res.status(500).send({ message: 'Произошла ошибка сервера' });
     });
 };
