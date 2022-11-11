@@ -1,6 +1,6 @@
 const Card = require('../models/card');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (res, req) => {
   Card.find({})
     .then((cards) => res.status(200).send({ data: cards }))
     .catch((err) => {
@@ -15,7 +15,7 @@ module.exports.getCards = (req, res) => {
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
   Card.create({ name, link })
-    .then((card) => res.status(200).send({ data: card }, req.user._id))
+    .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
@@ -25,17 +25,19 @@ module.exports.createCard = (req, res) => {
     });
 };
 
-module.exports.deleteCardById = (req, res) => {
-  Card.findById(req.params.cardId)
-    .then((card) => res.status(200).send({ data: card }))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(404).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
-      }
-    });
-};
+module.exports.deleteCardById = (req, res) => Card.findByIdAndRemove(req.params.cardId)
+  .then((cards) => {
+    if (!cards) {
+      return res.status(400).send({ message: 'Объект не найден' });
+    } return res.send({ data: cards });
+  })
+  .catch((err) => {
+    if (err.name === 'ValidationError') {
+      return res.status(400).send({ message: 'Ошибка обработки данных' });
+    } return res.status(500).send({ message: 'Ошибка работы сервера' });
+  });
 
-module.exports.likeCard = (req, res) => Card.findById(
+module.exports.likeCard = (res, req) => Card.findById(
   req.params.cardId,
   { $addToSet: { likes: req.user._id } },
   { new: true },
@@ -47,7 +49,7 @@ module.exports.likeCard = (req, res) => Card.findById(
     }
   });
 
-module.exports.dislikeCard = (req, res) => Card.findById(
+module.exports.dislikeCard = (res, req) => Card.findById(
   req.params.cardId,
   { $pull: { likes: req.user._id } },
   { new: true },

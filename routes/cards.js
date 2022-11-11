@@ -3,9 +3,14 @@ const {
   getCards, createCard, deleteCard, likeCard, dislikeCard,
 } = require('../controllers/cards');
 
-router.get('/cards', getCards);
-router.post('/cards', createCard);
-router.delete('/cards/:cardId', deleteCard);
-router.PUT('/cards/:cardId/likes', likeCard);
-router.PUT('PUT /cards/:cardId/likes', dislikeCard);
+router.get('/', getCards);
+router.post('/', createCard);
+router.delete('/:cardId', deleteCard);
+router.PUT('/:cardId/likes', likeCard);
+router.PUT('PUT /:cardId/likes', dislikeCard);
+
+router.use((req, res) => {
+  res.status(404).send({ message: 'Страница по указанному маршруту не найдена' });
+});
+
 module.exports = router;

@@ -4,9 +4,13 @@ const {
 } = require('../controllers/users');
 
 router.get('/', getUsers);
-router.get('/:id', getUserById);
+router.get('/:userId', getUserById);
 router.post('/', createUser);
-router.patch('/users/me', updateProfile);
-router.patch('/users/me/avatar', updateAvatar);
+router.patch('/me', updateProfile);
+router.patch('/me/avatar', updateAvatar);
+
+router.use((req, res) => {
+  res.status(404).send({ message: 'Страница по указанному маршруту не найдена' });
+});
 
 module.exports = router;
