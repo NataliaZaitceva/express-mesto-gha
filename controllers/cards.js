@@ -51,8 +51,10 @@ module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
     res.status(200).send({ data: cards });
   })
   .catch((err) => {
-    if (err.name === 'ValidationError') {
+    if (err.name === 'CastError') {
       res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
+    } else {
+      res.status(500).send({ message: 'Произошла ошибка сервера' });
     }
   });
 
