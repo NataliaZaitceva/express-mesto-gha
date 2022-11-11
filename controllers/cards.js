@@ -52,7 +52,7 @@ module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
   })
   .catch((err) => {
     if (err.name === 'CastError') {
-      res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
+      res.status(400).send({ message: 'Произошла ошибка' });
     } else {
       res.status(500).send({ message: 'Произошла ошибка сервера' });
     }
@@ -72,7 +72,7 @@ module.exports.dislikeCard = (res, req) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
+        res.status(400).send({ message: 'Произошла ошибка' });
       } else {
         res.status(500).send({ message: 'Произошла ошибка сервера' });
       }
