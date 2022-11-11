@@ -74,9 +74,8 @@ module.exports.dislikeCard = (res, req) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Произошла ошибка' });
-      } else {
-        res.status(500).send({ message: 'Произошла ошибка сервера' });
+        return res.status(400).send({ message: 'Произошла ошибка' });
       }
+      return res.status(500).send({ message: 'Произошла ошибка сервера' });
     });
 };
