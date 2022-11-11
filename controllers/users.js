@@ -19,7 +19,7 @@ module.exports.createUser = (req, res) => {
     .then((newUser) => res.send({ data: newUser }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(404).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
+        res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
       } else {
         res.status(500).send({ message: 'Произошла ошибка сервера' });
       }
@@ -29,7 +29,7 @@ module.exports.createUser = (req, res) => {
 module.exports.getUserById = (res, req) => {
   User.findById(req.params.id)
     .orFail(() => { throw new Error('Пользватель по указанному Id не найден'); })
-    .then((userId) => res.status(200).send({ data: userId }))
+    .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Передан невалидный id пользователя' });
