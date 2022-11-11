@@ -66,12 +66,7 @@ module.exports.dislikeCard = (res, req) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .then((cards) => {
-      if (!cards) {
-        res.status(400).send({ message: 'Передан несуществующий _id карточки.' });
-      }
-      return res.status(200).send({ data: cards });
-    })
+    .then((cards) => res.status(200).send({ data: cards }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(400).send({ message: 'Произошла ошибка' });
