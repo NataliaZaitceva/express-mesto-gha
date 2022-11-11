@@ -32,13 +32,11 @@ module.exports.getUserById = (req, res) => {
       if (user) {
         res.status(200).send({ data: user });
       } else {
-        res.status(404).send({ message: 'Ошибка. Пользователь не найден, попробуйте еще раз' });
+        res.status(404).send({ message: 'Пользователь по указанному _id не найден.' });
       }
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
-      } else {
+      if (err.name === 'ValidationError') {
         res.status(500).send({ message: 'Произошла ошибка сервера' });
       }
     });
@@ -50,13 +48,13 @@ module.exports.updateProfile = (req, res) => {
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        res.status(404).send({ message: 'Пользователь по указанному id не найден' });
+        res.status(404).send({ message: 'Пользователь с указанным id не найден' });
       }
       return res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Переданы некорректные данные при редактировании пользователя' });
+        res.status(404).send({ message: 'Переданы некорректные данные при редактировании пользователя' });
       } else if (err.name === 'CastError') {
         res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
       }
@@ -78,7 +76,7 @@ module.exports.updateAvatar = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
       } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Пользователь по указанному _id не найден.' });
+        res.status(404).send({ message: 'Пользователь с указанным _id не найден.' });
       }
       res.status(500).send({ message: 'Произошла ошибка сервера' });
     });
