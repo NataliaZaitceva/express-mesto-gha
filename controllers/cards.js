@@ -45,17 +45,12 @@ module.exports.likeCard = (res, req) => Card.findById(
     }
   });
 
-module.exports.dislikeCard = (res, req) => Card.findByIdAndUpdate(
+module.exports.dislikeCard = (res, req) => Card.findById(
   req.params.cardId,
   { $pull: { likes: req.user._id } },
   { new: true },
 )
-  .then((cards) => {
-    if (!cards) {
-      return res.status(404).send({ message: 'Объект не найден' });
-    }
-    return res.status(200).send({ data: cards });
-  })
+  .then((cards) => res.status(200).send(req.params.cardId, { data: cards }))
   .catch((err) => {
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });

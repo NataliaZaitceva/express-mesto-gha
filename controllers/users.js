@@ -42,11 +42,11 @@ module.exports.getUserById = (res, req) => {
 };
 
 module.exports.updateProfile = (res, req) => {
-  const { user: { _id }, body } = req;
+  const { name, about } = req.body;
 
-  User.findByIdAndUpdate(_id, body, { new: true, runValidators: true })
-    .orFail(() => { throw new Error('Пользватель по указанному Id не найден'); })
+  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => res.status(200).send({ data: user }))
+    .orFail(() => { throw new Error('Пользватель по указанному Id не найден'); })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Передан невалидный id пользователя' });
