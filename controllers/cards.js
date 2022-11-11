@@ -68,13 +68,14 @@ module.exports.dislikeCard = (res, req) => {
       if (!cards) {
         res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
       }
-      res.status(200).send({ data: cards });
+      return res.status(200).send({ data: cards });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Произошла ошибка' });
-      } else {
-        res.status(500).send({ message: 'Произошла ошибка сервера' });
+        res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
+      } else if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Пользователь с указанным _id не найден.' });
       }
+      res.status(500).send({ message: 'Произошла ошибка сервера' });
     });
 };
