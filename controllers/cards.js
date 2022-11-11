@@ -12,9 +12,8 @@ module.exports.getCards = (req, res) => {
 
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
-  const owner = req.user._id;
-  Card.create({ name, link, owner })
-    .then((card) => res.status(200).send(req.user._id, { card }))
+  Card.create({ name, link, owner: req.user._id })
+    .then((card) => res.send({ card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
@@ -28,12 +27,13 @@ module.exports.deleteCard = (req, res) => Card.findByIdAndRemove(req.params.card
   .then((card) => {
     if (!card) {
       res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
+    } else {
+      res.status(200).send({ data: card });
     }
-    return res.status(200).send({ data: card });
   })
   .catch((err) => {
-    if (err.name === 'ValidationError') {
-      return res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
+    if (err.name === 'CastError') {
+      res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
     } return res.status(500).send({ message: 'Произошла ошибка сервера' });
   });
 
@@ -46,11 +46,13 @@ module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
     if (!cards) {
       res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
     }
-    return res.status(200).send({ data: cards });
+    res.status(200).send({ data: cards });
   })
   .catch((err) => {
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
+    } else {
+      res.status(500).send({ message: 'Произошла ошибка сервера' });
     }
   });
 
@@ -64,7 +66,7 @@ module.exports.dislikeCard = (res, req) => {
       if (!cards) {
         res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
       }
-      return res.status(200).send({ data: cards });
+      res.status(200).send({ data: cards });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
