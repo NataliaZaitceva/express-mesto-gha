@@ -27,9 +27,8 @@ module.exports.deleteCard = (req, res) => Card.findByIdAndRemove(req.params.card
   .then((card) => {
     if (!card) {
       res.status(404).send({ message: 'Карточка с указанным _id не найдена.' });
-    } else {
-      res.status(200).send({ data: card });
     }
+    res.status(200).send({ data: card });
   })
   .catch((err) => {
     if (err.name === 'CastError') {
@@ -68,7 +67,7 @@ module.exports.dislikeCard = (res, req) => {
       if (!cards) {
         res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
       }
-      return res.status(200).send({ data: cards });
+      res.status(200).send({ data: cards });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
