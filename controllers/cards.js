@@ -60,26 +60,24 @@ module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
     }
   });
 
-module.exports.dislikeCard = (res, req) => {
-  Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $pull: { likes: req.user._id } },
-    { new: true },
-  )
-    .then((card) => res.send({ data: card }))
-    .orFail(() => {
-      throw new Error('NotFound');
-    })
-    .catch((err) => {
-      if (err.message === 'NotFound') {
-        return res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
-      }
-      if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Произошла ошибка' });
-      }
-      if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Произошла ошибка' });
-      }
-      return res.status(500).send({ message: 'Произошла ошибка сервера' });
-    });
-};
+module.exports.dislikeCard = (res, req) => Card.findByIdAndUpdate(
+  req.params.cardId,
+  { $pull: { likes: req.user._id } },
+  { new: true },
+).orFail(() => {
+  throw new Error('NotFound');
+})
+  .then((card) => res.send({ data: card }))
+
+  .catch((err) => {
+    if (err.message === 'NotFound') {
+      return res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
+    }
+    if (err.name === 'ValidationError') {
+      return res.status(400).send({ message: 'Произошла ошибка' });
+    }
+    if (err.name === 'CastError') {
+      return res.status(400).send({ message: 'Произошла ошибка' });
+    }
+    return res.status(500).send({ message: 'Произошла ошибка сервера' });
+  });
