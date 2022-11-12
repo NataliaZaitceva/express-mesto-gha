@@ -71,17 +71,16 @@ module.exports.dislikeCard = (res, req) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => {
-      if (!card) {
-        throw new Error('NotFound');
-      }
-      res.send({ data: card });
+    .orFail(() => {
+      throw new Error('NotFound');
     })
+    .then((card) => res.send({ data: card }))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Карточка с указанным _id не найдена.' });
-      } else {
-        res.status(500).send({ message: 'Произошла ошибка сервера' });
+      if (err.message === 'NotFound') {
+        return res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
+      } if (err.name === 'ValidationError') {
+        return res.status(400).send({ message: 'Произошла ошибка' });
       }
+      return res.status(400).send({ message: 'Произошла ошибка' });
     });
 };
