@@ -65,23 +65,22 @@ module.exports.likeCard = (req, res) => {
     });
 };
 
-module.exports.dislikeCard = (res, req) => {
+module.exports.dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(() => {
-      throw new Error('NotFound');
-    })
-    .then((card) => res.send({ data: card }))
-    .catch((err) => {
-      if (err.message === 'NotFound') {
+    .then((cards) => {
+      if (!cards) {
         res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
-      } else if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Произошла ошибка' });
-      } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Произошла ошибка' });
+      }
+      res.status(200).send({ data: cards });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(404).send({ message: 'Произошла ошибка' });
+        res.status(400).send({ message: 'Произошла ошибка сервера' });
       } else {
         res.status(500).send({ message: 'Произошла ошибка сервера' });
       }
