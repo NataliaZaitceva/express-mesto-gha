@@ -79,8 +79,7 @@ module.exports.dislikeCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(404).send({ message: 'Произошла ошибка' });
-        res.status(400).send({ message: 'Произошла ошибка сервера' });
+        res.status(400).send({ message: 'Произошла ошибка' });
       } else {
         res.status(500).send({ message: 'Произошла ошибка сервера' });
       }
