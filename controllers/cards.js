@@ -46,11 +46,11 @@ module.exports.likeCard = (req, res) => Card.findByIdAndUpdate(
   { $addToSet: { likes: req.user._id } },
   { new: true },
 )
-  .then((cards) => {
-    if (!cards) {
+  .then((card) => {
+    if (!card) {
       res.status(404).send({ message: 'Передан несуществующий _id карточки.' });
     }
-    res.status(200).send({ data: cards });
+    res.status(200).send({ data: card });
   })
   .catch((err) => {
     if (err.name === 'CastError') {
