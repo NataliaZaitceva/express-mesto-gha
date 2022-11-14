@@ -1,9 +1,6 @@
 const User = require('../models/user');
 const {
   SERVER_ERROR,
-  INVALID_CARD,
-  INVALID_DATA,
-  INVALID_FIELD,
   INVALID_ID,
   MISSING_USER,
   ERROR_CODE_BAD_REQUEST,
