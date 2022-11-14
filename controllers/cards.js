@@ -20,8 +20,8 @@ module.exports.getCards = (req, res) => {
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
   const owner = req.user._id;
-  Card.create({ name, link, owner })
-    .then((card) => res.send({ data: card }))
+  Card.create({ name, link })
+    .then((card) => res.send({ data: card, owner }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_CODE_BAD_REQUEST).send({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` });
