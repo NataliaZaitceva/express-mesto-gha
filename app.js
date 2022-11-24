@@ -1,8 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
-const routerUsers = require('./routes/users');
-const routerCards = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
 // Слушаем 3000 порт
 const PORT = 3000;
@@ -18,9 +16,6 @@ app.post('/signup', createUser);
 
 // авторизация
 app.use(auth);
-
-app.use('/users', routerUsers);
-app.use('/cards', routerCards);
 
 // роуты, которым авторизация нужна
 app.use('/cards', require('./routes/cards'));
