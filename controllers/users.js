@@ -22,25 +22,28 @@ module.exports.getUsers = (req, res) => {
 
 module.exports.createUser = (req, res, next) => {
   const {
-    name, about, avatar, email, password,
+    name, about, avatar, email,
   } = req.body;
-  if (!email || !password) {
-    next(new ERROR_CODE_BAD_REQUEST('Поля email и password обязательны.'));
-  }
-  bcrypt.hash(password, 10)
-    .then((hash) => User.create({
-      name, about, avatar, email, password: hash,
-    }))
-    .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new ERROR_CODE_BAD_REQUEST('Переданы некорректные данные при создании пользователя.'));
-      } else if (err.code === 11000) {
-        next(new ERROR_DATA('Передан уже зарегистрированный email.'));
-      } else {
-        next(err);
-      }
-    });
+  bcrypt.hash(req.body.password)
+    .then((hash) => {
+      User.create({
+        name, about, avatar, email, password: hash,
+      })
+        .then((user) => res.send({
+          name: user.name, about: user.about, avatar: user.avatar, email: user.email,
+        }))
+        .catch((err) => {
+          if (err.name === 'ValidationError') {
+            next(new ERROR_CODE_BAD_REQUEST('Ошибка'));
+          }
+          if (err.code === 11000) {
+            next(new ERROR_DATA('Такой email уже существует.'));
+          } else {
+            next(err);
+          }
+        });
+    })
+    .catch(next);
 };
 
 module.exports.login = (req, res, next) => {
@@ -48,7 +51,7 @@ module.exports.login = (req, res, next) => {
   return User.findOne({ email }).select('+password')
     .then((user) => {
       bcrypt.compare(password, SALT_ROUND, user.password, (error, hash) => {
-        if (error) res.status(401).send({ message: ' Что-то пошло не так ' });
+        if (error) return res.status(401).send({ message: ' Что-то пошло не так ' });
         console.log({ hash });
         const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
         res

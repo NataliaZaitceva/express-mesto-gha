@@ -8,11 +8,7 @@ const { AVATAR_REGEX } = require('../constants');
 router.get('/', getUsers);
 router.get('/me', celebrate({
   body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    about: Joi.string().required().min(2).max(30),
-    avatar: Joi.string().required().pattern(AVATAR_REGEX),
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
+    userId: Joi.string().length(24).hex().required(),
   }),
 }), getUserInfo);
 router.get('/:userId', celebrate({
@@ -21,6 +17,10 @@ router.get('/:userId', celebrate({
   }),
 }), getUserById);
 router.patch('/me', updateProfile);
-router.patch('/me/avatar', updateAvatar);
+router.patch('/me/avatar', celebrate({
+  body: Joi.object().keys({
+    avatar: Joi.string().required().pattern(AVATAR_REGEX),
+  }),
+}), updateAvatar);
 
 module.exports = router;
