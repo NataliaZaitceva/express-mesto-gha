@@ -22,9 +22,9 @@ module.exports.getUsers = (req, res) => {
 
 module.exports.createUser = (req, res, next) => {
   const {
-    name, about, avatar, email,
+    name, about, avatar, email, password,
   } = req.body;
-  bcrypt.hash(req.body.password, 5)
+  bcrypt.hash(password, 5)
     .then((hash) => User.create({
       email: req.body.email,
       password: hash,
@@ -32,7 +32,7 @@ module.exports.createUser = (req, res, next) => {
       about,
       avatar,
     }))
-    .then((user) => res.send({ data: user, _id: user._id }))
+    .then((user) => res.send(user))
 
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -44,7 +44,7 @@ module.exports.createUser = (req, res, next) => {
 
   User.findOne({ email }).then((user) => {
     if (user) {
-      return res.status(ERROR_DATA).send({ message: 'Такой пользователь уже существует' });
+      res.status(ERROR_DATA).send({ message: 'Такой пользователь уже существует' });
     }
   }).catch((err) => {
     if (err.name === 'ValidationError') {
@@ -58,7 +58,7 @@ module.exports.login = (req, res, next) => {
   return User.findOne({ email }).select('+password')
     .then((user) => {
       bcrypt.compare(password, SALT_ROUND, user.password, (error, hash) => {
-        if (error) return res.status(401).send({ message: ' Что-то пошло не так ' });
+        if (error) res.status(401).send({ message: ' Что-то пошло не так ' });
         console.log({ hash });
         const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
         res
