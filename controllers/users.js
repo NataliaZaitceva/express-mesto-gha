@@ -48,7 +48,7 @@ module.exports.createUser = (req, res, next) => {
     }
   }).catch((err) => {
     if (err.name === 'ValidationError') {
-      res.status(ERROR_CODE_INTERNAL(SERVER_ERROR));
+      next(ERROR_CODE_INTERNAL(SERVER_ERROR));
     }
   });
 };
@@ -104,7 +104,8 @@ module.exports.getUserById = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(ERROR_CODE_BAD_REQUEST(INVALID_ID));
-      } else {next(err);
+      } else {
+        next(err);
       }
     });
 };

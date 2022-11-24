@@ -62,7 +62,7 @@ module.exports.likeCard = (req, res, next) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.message === 'NotFound') {
-        return res.status(ERROR_CODE_NOT_FOUND).send({ message: INVALID_CARD });
+        next(ERROR_CODE_NOT_FOUND(INVALID_CARD));
       }
       if (err.name === 'CastError') {
         next(ERROR_CODE_BAD_REQUEST(INVALID_ID));

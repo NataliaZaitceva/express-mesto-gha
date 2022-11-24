@@ -30,7 +30,7 @@ app.use((req, res) => {
   res.status(404).send({ message: 'Страница по указанному маршруту не найдена' });
 });
 
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   res.status(500).send({ message: 'На сервере произошла ошибка' });
 });
 
