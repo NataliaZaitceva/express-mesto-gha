@@ -32,17 +32,16 @@ app.use(auth);
 app.use('/users', routerUsers);
 app.use('/cards', routerCards);
 
-app.use('*', (req, res) => {
-  if (res.status(ERROR_CODE_NOT_FOUND)) {
-    throw new INVALID_DATA('Необходимо авторизироваться');
-  }
+app.use((req, res, next) => {
+  next(new ERROR_CODE_NOT_FOUND('Страница не найдена'));
 });
 
 app.use((err, req, res, next) => {
-  console.log(err);
-  res.status(500).send({ message: 'На сервере произошла ошибка' });
+  const { statusCode = 500, message = 'Ошибка сервера' } = err;
+  res.status(statusCode).send({ message });
   next();
 });
+
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });

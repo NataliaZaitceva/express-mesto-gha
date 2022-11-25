@@ -24,26 +24,22 @@ module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email,
   } = req.body;
-  bcrypt.hash(req.body.password)
-    .then((hash) => {
-      User.create({
-        name, about, avatar, email, password: hash,
-      })
-        .then((user) => res.send({
-          name: user.name, about: user.about, avatar: user.avatar, email: user.email,
-        }))
-        .catch((err) => {
-          if (err.name === 'ValidationError') {
-            next(new ERROR_CODE_BAD_REQUEST('Ошибка'));
-          }
-          if (err.code === 11000) {
-            next(new ERROR_DATA('Такой email уже существует.'));
-          } else {
-            next(err);
-          }
-        });
-    })
-    .catch(next);
+  bcrypt.hash(req.body.password, 10)
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    }))
+    .then((user) => res.send({
+      name: user.name, about: user.about, avatar: user.avatar, email: user.email,
+    }))
+    .catch((err) => {
+      if (err.code === 11000) {
+        return next(new ERROR_DATA('Такой email уже существует.'));
+      }
+      if (err.name === 'ValidationError') {
+        return next(new ERROR_CODE_BAD_REQUEST('Ошибка'));
+      }
+      return next(err);
+    });
 };
 
 module.exports.login = (req, res, next) => {
