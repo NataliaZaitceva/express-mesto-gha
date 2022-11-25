@@ -3,9 +3,10 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const { celebrate, Joi } = require('celebrate');
 const { login, createUser } = require('./controllers/users');
-const { ERROR_CODE_NOT_FOUND, INVALID_DATA, AVATAR_REGEX } = require('./constants');
+const { AVATAR_REGEX } = require('./constants');
 const routerUsers = require('./routes/users');
 const routerCards = require('./routes/cards');
+const BadRequest = require('./Errors/BadRequest');
 // Слушаем 3000 порт
 const PORT = 3000;
 const app = express();
@@ -33,7 +34,7 @@ app.use('/users', routerUsers);
 app.use('/cards', routerCards);
 
 app.use((req, res, next) => {
-  next(new ERROR_CODE_NOT_FOUND('Страница не найдена'));
+  next(new BadRequest('Страница не найдена'));
 });
 
 app.use((err, req, res, next) => {

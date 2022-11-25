@@ -8,9 +8,10 @@ const {
   ERROR_CODE_BAD_REQUEST,
   ERROR_CODE_NOT_FOUND,
   ERROR_CODE_INTERNAL,
-  ERROR_DATA,
 } = require('../constants');
 const SALT_ROUND = require('../config');
+const BadRequest = require('../Errors/BadRequest');
+const DoubleEmailError = require('../Errors/DoubleEmailError');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
@@ -24,7 +25,7 @@ module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email,
   } = req.body;
-  bcrypt.hash(req.body.password, 10)
+  return bcrypt.hash(req.body.password, 10)
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
@@ -33,12 +34,12 @@ module.exports.createUser = (req, res, next) => {
     }))
     .catch((err) => {
       if (err.code === 11000) {
-        return next(new ERROR_DATA('Такой email уже существует.'));
+        next(new DoubleEmailError('Такой email уже существует.'));
       }
       if (err.name === 'ValidationError') {
-        return next(new ERROR_CODE_BAD_REQUEST('Ошибка'));
+        next(new BadRequest('Ошибка'));
       }
-      return next(err);
+      next(err);
     });
 };
 
