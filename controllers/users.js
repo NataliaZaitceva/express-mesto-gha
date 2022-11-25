@@ -51,7 +51,7 @@ module.exports.login = (req, res, next) => {
   return User.findOne({ email }).select('+password')
     .then((user) => {
       bcrypt.compare(password, SALT_ROUND, user.password, (error, hash) => {
-        if (error) return res.status(401).send({ message: ' Что-то пошло не так ' });
+        if (error) res.status(401).send({ message: ' Что-то пошло не так ' });
         console.log({ hash });
         const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
         res
