@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const { celebrate, Joi } = require('celebrate');
+const { errors } = require('celebrate');
 const { login, createUser } = require('./controllers/users');
 const { AVATAR_REGEX } = require('./constants');
 const routerUsers = require('./routes/users');
@@ -25,7 +26,12 @@ app.post('/signup', celebrate({
     password: Joi.string().required(),
   }),
 }), createUser);
-app.post('/signin', login);
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+  }),
+}), login);
 // авторизация
 app.use(auth);
 
@@ -36,6 +42,8 @@ app.use('/cards', routerCards);
 app.use((req, res, next) => {
   next(new BadRequest('Страница не найдена'));
 });
+
+app.use(errors());
 
 app.use((err, req, res, next) => {
   const { statusCode = 500, message = 'Ошибка сервера' } = err;
