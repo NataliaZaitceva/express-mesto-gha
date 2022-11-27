@@ -32,15 +32,7 @@ module.exports.createUser = (req, res, next) => {
     .then((user) => res.send({
       name: user.name, about: user.about, avatar: user.avatar, email: user.email,
     }))
-    .catch((err) => {
-      if (err.code === 11000) {
-        next(new DoubleEmailError('Такой email уже существует.'));
-      }
-      if (err.name === 'ValidationError') {
-        next(new BadRequest('Ошибка'));
-      }
-      next(err);
-    });
+    .catch((err) => res.status(400).send(err));
 };
 
 module.exports.login = (req, res, next) => {
