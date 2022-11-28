@@ -6,13 +6,13 @@ const bcrypt = require('bcryptjs');
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    default: 'Жак Ив Кусто',
+    default: 'Жак-Ив Кусто',
     minlength: 2,
     maxlength: 30,
   },
   about: {
     type: String,
-    default: 'исследователь',
+    default: 'Исследователь',
     minlength: 2,
     maxlength: 30,
   },
