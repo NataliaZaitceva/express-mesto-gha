@@ -2,8 +2,6 @@ const mongoose = require('mongoose');
 const isEmail = require('validator/lib/isEmail');
 const isURL = require('validator/lib/isURL');
 const bcrypt = require('bcryptjs');
-const { ERROR_DATA } = require('../constants');
-const BadRequest = require('../Errors/BadRequest');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -11,12 +9,14 @@ const userSchema = new mongoose.Schema({
     default: 'Жак Ив Кусто',
     minlength: 2,
     maxlength: 30,
+    required: true,
   },
   about: {
     type: String,
     default: 'исследователь',
     minlength: 2,
     maxlength: 30,
+    required: true,
   },
   avatar: {
     type: String,
@@ -24,6 +24,7 @@ const userSchema = new mongoose.Schema({
     validate: {
       validator: (v) => isURL(v),
       message: 'Неправильный формат ссылки',
+      required: true,
     },
   },
   email: {
