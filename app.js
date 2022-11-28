@@ -28,7 +28,7 @@ app.post('/signup', celebrate({
     avatar: Joi.string().pattern(AVATAR_REGEX),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
-  }).unknown(true),
+  }),
 }), createUser);
 
 // авторизация

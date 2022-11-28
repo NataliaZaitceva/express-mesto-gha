@@ -56,10 +56,12 @@ module.exports.likeCard = (req, res, next) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(() => {
-      throw new Error('NotFound');
+    .then((cards) => {
+      if (!cards) {
+        next(new NotFoundError(INVALID_CARD));
+      }
+      res.send({ data: cards });
     })
-    .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.message === 'NotFound') {
         next(new NotFoundError(INVALID_CARD));
