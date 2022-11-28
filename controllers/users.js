@@ -2,7 +2,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const {
-  SERVER_ERROR,
   INVALID_ID,
   MISSING_USER,
   ERROR_CODE_BAD_REQUEST,
@@ -43,17 +42,30 @@ module.exports.createUser = (req, res, next) => {
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
-  return User.findUserByCredentials(email, password)
+  User.findOne({ email }).select('+password')
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
-      return res
-        .cookie('jwt', token, {
-          maxAge: 3600000,
-          httpOnly: true,
-        })
-        .send({ token });
+      if (!user) {
+        return Promise.reject(new Error('Неправильные почта или пароль'));
+      }
+      return bcrypt.compare(password, user.password, (error, hash) => {
+        if (!hash) {
+          return res.status(401).send({ message: ' Что-то пошло не так ' });
+        }
+        const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+        return res
+          .cookie('jwt', token, {
+            maxAge: 3600000,
+            httpOnly: true,
+          })
+          .send({ token });
+      });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequest('Ошибка'));
+      }
+      next(err);
+    });
 };
 
 module.exports.getUserInfo = (req, res, next) => {
@@ -76,7 +88,7 @@ module.exports.getUserInfo = (req, res, next) => {
       }
     });
 };
-module.exports.getUser = (req, res, next) => {
+module.exports.getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
@@ -102,10 +114,9 @@ module.exports.getUserById = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(ERROR_CODE_BAD_REQUEST(INVALID_ID));
-      } else {
-        next(err);
+        next(new BadRequest('Некорректные данные пользователя'));
       }
+      next(err);
     });
 };
 

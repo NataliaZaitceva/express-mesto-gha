@@ -5,13 +5,11 @@ const { celebrate, Joi } = require('celebrate');
 const { errors } = require('celebrate');
 const { login, createUser } = require('./controllers/users');
 const { AVATAR_REGEX } = require('./constants');
-const routerUsers = require('./routes/users');
-const routerCards = require('./routes/cards');
-const BadRequest = require('./Errors/BadRequest');
 // Слушаем 3000 порт
 const PORT = 3000;
 const app = express();
 const auth = require('./middlewares/auth');
+const NotFoundError = require('./Errors/NotFoundError');
 
 app.use(bodyParser.json()); // для собирания JSON-формата
 app.use(bodyParser.urlencoded({ extended: true })); // для приёма веб-страниц внутри POST-запроса
@@ -37,11 +35,11 @@ app.post('/signup', celebrate({
 app.use(auth);
 
 // роуты, которым авторизация нужна
-app.use('/users', routerUsers);
-app.use('/cards', routerCards);
+app.use('/users', require('./routes/users'));
+app.use('/cards', require('./routes/cards'));
 
 app.use((req, res, next) => {
-  next(new BadRequest('Страница не найдена'));
+  next(new NotFoundError('Страница не найдена'));
 });
 
 app.use(errors());
