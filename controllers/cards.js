@@ -2,10 +2,10 @@ const {
   SERVER_ERROR,
   INVALID_CARD,
   INVALID_ID,
-  ERROR_CODE_BAD_REQUEST,
-  ERROR_CODE_NOT_FOUND,
   ERROR_CODE_INTERNAL,
 } = require('../constants');
+const BadRequest = require('../Errors/BadRequest'); // 400
+const NotFoundError = require('../Errors/NotFoundError'); // 404
 
 const Card = require('../models/card');
 
@@ -24,7 +24,7 @@ module.exports.createCard = (req, res, next) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(ERROR_CODE_BAD_REQUEST({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` }));
+        next(new BadRequest({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` }));
       } else {
         next(err);
       }
@@ -41,10 +41,10 @@ module.exports.deleteCard = (req, res, next) => {
       res.send({ data: card });
     }).catch((err) => {
       if (err.message === 'NotFound') {
-        next(new ERROR_CODE_NOT_FOUND(INVALID_CARD));
+        next(new NotFoundError(INVALID_CARD));
       }
       if (err.name === 'CastError') {
-        next(ERROR_CODE_BAD_REQUEST(INVALID_ID));
+        next(new BadRequest(INVALID_ID));
       }
       next(err);
     });
@@ -62,10 +62,10 @@ module.exports.likeCard = (req, res, next) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.message === 'NotFound') {
-        next(ERROR_CODE_NOT_FOUND(INVALID_CARD));
+        next(new NotFoundError(INVALID_CARD));
       }
       if (err.name === 'CastError') {
-        next(ERROR_CODE_BAD_REQUEST(INVALID_ID));
+        next(new BadRequest(INVALID_ID));
       }
       next(err);
     });
@@ -79,13 +79,13 @@ module.exports.dislikeCard = (req, res, next) => {
   )
     .then((cards) => {
       if (!cards) {
-        res.status(ERROR_CODE_NOT_FOUND).send({ message: INVALID_CARD });
+        next(new NotFoundError(INVALID_CARD));
       }
       res.send({ data: cards });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(ERROR_CODE_BAD_REQUEST(INVALID_ID));
+        next(new BadRequest(INVALID_ID));
       } next(err);
     });
 };
