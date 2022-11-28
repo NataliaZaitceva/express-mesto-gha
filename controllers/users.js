@@ -9,9 +9,10 @@ const {
   ERROR_CODE_NOT_FOUND,
   ERROR_CODE_INTERNAL,
 } = require('../constants');
-const SALT_ROUND = require('../config');
+const { SALT_ROUND } = require('../config');
 const BadRequest = require('../Errors/BadRequest');
 const DoubleEmailError = require('../Errors/DoubleEmailError');
+const NotFoundError = require('../Errors/NotFoundError');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
@@ -25,17 +26,17 @@ module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email,
   } = req.body;
-  return bcrypt.hash(req.body.password, 10)
+  return bcrypt.hash(req.body.password, SALT_ROUND)
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
     .then((user) => res.send({
-      name: user.name, about: user.about, avatar: user.avatar, email: user.email,
+      name: user.name, about: user.about, avatar: user.avatar, email: user.email, _id: user._id,
     }))
     .catch((err) => {
       if (err.code === 11000) {
         next(new DoubleEmailError('Такой email уже существует.'));
-      } else if (err.name === 'ValidationError') {
+      } if (err.name === 'ValidationError') {
         next(new BadRequest('Ошибка'));
       }
       next(err);
@@ -44,13 +45,18 @@ module.exports.createUser = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-  return User.findOne({ email }).select('+password')
+
+  User.findOne({ email }).select('+password')
     .then((user) => {
-      bcrypt.compare(password, SALT_ROUND, user.password, (error, hash) => {
-        if (error) res.status(401).send({ message: ' Что-то пошло не так ' });
-        console.log({ hash });
+      if (!user) {
+        return Promise.reject(new Error('Неправильные почта или пароль'));
+      }
+      return bcrypt.compare(password, user.password, (error, hash) => {
+        if (!hash) {
+          return res.status(401).send({ message: ' Что-то пошло не так ' });
+        }
         const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
-        res
+        return res
           .cookie('jwt', token, {
             maxAge: 3600000,
             httpOnly: true,
@@ -58,7 +64,12 @@ module.exports.login = (req, res, next) => {
           .send({ token });
       });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequest('Ошибка'));
+      }
+      next(err);
+    });
 };
 
 module.exports.getUserInfo = (req, res, next) => {
@@ -79,6 +90,21 @@ module.exports.getUserInfo = (req, res, next) => {
       } else {
         next(err);
       }
+    });
+};
+module.exports.getUser = (req, res, next) => {
+  User.findById(req.user._id)
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('Пользователь не найден');
+      }
+      return res.send({ data: user });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequest('Некорректные данные пользователя'));
+      }
+      next(err);
     });
 };
 
