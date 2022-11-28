@@ -7,7 +7,6 @@ const {
   MISSING_USER,
   ERROR_CODE_BAD_REQUEST,
   ERROR_CODE_NOT_FOUND,
-  ERROR_CODE_INTERNAL,
 } = require('../constants');
 const { SALT_ROUND } = require('../config');
 const BadRequest = require('../Errors/BadRequest');
@@ -44,30 +43,17 @@ module.exports.createUser = (req, res, next) => {
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
-  User.findOne({ email }).select('+password')
+  return User.findUserByCredentials(email, password)
     .then((user) => {
-      if (!user) {
-        return Promise.reject(new Error('Неправильные почта или пароль'));
-      }
-      return bcrypt.compare(password, user.password, (error, hash) => {
-        if (!hash) {
-          return res.status(401).send({ message: ' Что-то пошло не так ' });
-        }
-        const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
-        return res
-          .cookie('jwt', token, {
-            maxAge: 3600000,
-            httpOnly: true,
-          })
-          .send({ token });
-      });
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      return res
+        .cookie('jwt', token, {
+          maxAge: 3600000,
+          httpOnly: true,
+        })
+        .send({ token });
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new BadRequest('Ошибка'));
-      }
-      next(err);
-    });
+    .catch(next);
 };
 
 module.exports.getUserInfo = (req, res, next) => {
