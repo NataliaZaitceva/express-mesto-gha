@@ -9,14 +9,12 @@ const userSchema = new mongoose.Schema({
     default: 'Жак Ив Кусто',
     minlength: 2,
     maxlength: 30,
-    required: true,
   },
   about: {
     type: String,
     default: 'исследователь',
     minlength: 2,
     maxlength: 30,
-    required: true,
   },
   avatar: {
     type: String,
@@ -24,7 +22,6 @@ const userSchema = new mongoose.Schema({
     validate: {
       validator: (v) => isURL(v),
       message: 'Неправильный формат ссылки',
-      required: true,
     },
   },
   email: {
