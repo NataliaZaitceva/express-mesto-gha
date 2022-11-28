@@ -14,12 +14,10 @@ const BadRequest = require('../Errors/BadRequest');
 const DoubleEmailError = require('../Errors/DoubleEmailError');
 const NotFoundError = require('../Errors/NotFoundError');
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => {
-      res.status(ERROR_CODE_INTERNAL).send({ message: SERVER_ERROR });
-    });
+    .catch((err) => next(err));
 };
 
 module.exports.createUser = (req, res, next) => {
