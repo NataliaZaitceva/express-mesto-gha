@@ -37,7 +37,7 @@ module.exports.deleteCard = (req, res, next) => {
       throw new Error('NotFound');
     })
     .then((card) => {
-      Card.deleteOne(req.params.cardId);
+      Card.remove(req.params.cardId);
       res.send({ data: card });
     }).catch((err) => {
       if (err.message === 'NotFound') {
@@ -74,7 +74,7 @@ module.exports.likeCard = (req, res, next) => {
 };
 
 module.exports.dislikeCard = (req, res, next) => {
-  Card.findByIdAndUpdate(
+  Card.remove(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
