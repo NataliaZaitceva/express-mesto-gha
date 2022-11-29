@@ -47,7 +47,7 @@ module.exports.login = (req, res, next) => {
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        return Promise.reject(new Error('Неправильные почта или пароль'));
+        return Promise.reject(new AuthError('Неправильные почта или пароль'));
       }
       return bcrypt.compare(password, user.password, (error, hash) => {
         if (!hash) {

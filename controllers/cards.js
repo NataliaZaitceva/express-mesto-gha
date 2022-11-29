@@ -41,12 +41,12 @@ module.exports.deleteCard = (req, res, next) => {
       res.send({ data: card });
     }).catch((err) => {
       if (err.message === 'NotFound') {
-        next(new NotFoundError(INVALID_CARD));
+        return next(new NotFoundError(INVALID_CARD));
       }
       if (err.name === 'CastError') {
-        next(new BadRequest(INVALID_ID));
+        return next(new BadRequest(INVALID_ID));
       }
-      next(err);
+      return next(err);
     });
 };
 
@@ -58,7 +58,7 @@ module.exports.likeCard = (req, res, next) => {
   )
     .then((cards) => {
       if (!cards) {
-        next(new NotFoundError(INVALID_CARD));
+        throw new NotFoundError(INVALID_CARD);
       }
       res.send({ data: cards });
     })
