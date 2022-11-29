@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const { celebrate, Joi } = require('celebrate');
 const { errors } = require('celebrate');
 const { login, createUser } = require('./controllers/users');
-const URL_REG_ESP = require('./constants');
+
 // Слушаем 3000 порт
 const PORT = 3000;
 const app = express();
