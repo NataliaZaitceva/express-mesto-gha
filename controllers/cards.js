@@ -77,7 +77,7 @@ module.exports.dislikeCard = (req, res, next) => {
   )
     .then((cards) => {
       if (!cards) {
-        next(new NotFoundError(INVALID_CARD));
+        throw new NotFoundError(INVALID_CARD);
       }
       res.send({ data: cards });
     })
