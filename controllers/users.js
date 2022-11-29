@@ -11,6 +11,7 @@ const { SALT_ROUND } = require('../config');
 const BadRequest = require('../Errors/BadRequest');
 const DoubleEmailError = require('../Errors/DoubleEmailError');
 const NotFoundError = require('../Errors/NotFoundError');
+const AuthError = require('../Errors/AuthError');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -40,7 +41,9 @@ module.exports.createUser = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-
+  if (email === undefined || password === undefined) {
+    throw new AuthError();
+  }
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
