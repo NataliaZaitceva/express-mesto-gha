@@ -33,10 +33,10 @@ module.exports.createCard = (req, res, next) => {
 
 module.exports.deleteCard = (req, res, next) => {
   Card.findByIdAndRemove(req.params.cardId)
-    .orFail(() => {
-      throw new Error('NotFound');
-    })
     .then((card) => {
+      if (!card) {
+        throw new NotFoundError(INVALID_CARD);
+      }
       Card.deleteOne(req.params.cardId);
       res.send({ data: card });
     }).catch((err) => {
@@ -60,7 +60,7 @@ module.exports.likeCard = (req, res, next) => {
       if (!cards) {
         throw new NotFoundError(INVALID_CARD);
       }
-      return res.send({ data: cards });
+      res.send({ data: cards });
     })
     .catch((err) => {
       if (err.message === 'NotFound') next(new NotFoundError(INVALID_CARD));
@@ -79,10 +79,9 @@ module.exports.dislikeCard = (req, res, next) => {
       if (!cards) {
         throw new NotFoundError(INVALID_CARD);
       }
-      return res.send({ data: cards });
+      res.send({ data: cards });
     })
     .catch((err) => {
-      if (err.message === 'NotFound') next(new NotFoundError(INVALID_CARD));
       if (err.name === 'CastError') next(new BadRequest(INVALID_ID));
       next(err);
     });
