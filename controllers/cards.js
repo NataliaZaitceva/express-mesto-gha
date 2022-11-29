@@ -60,7 +60,7 @@ module.exports.likeCard = (req, res, next) => {
       if (!cards) {
         throw new NotFoundError(INVALID_CARD);
       }
-      res.send({ data: cards });
+      return res.send({ data: cards });
     })
     .catch((err) => {
       if (err.message === 'NotFound') next(new NotFoundError(INVALID_CARD));
@@ -79,7 +79,7 @@ module.exports.dislikeCard = (req, res, next) => {
       if (!cards) {
         throw new NotFoundError(INVALID_CARD);
       }
-      res.send({ data: cards });
+      return res.send({ data: cards });
     })
     .catch((err) => {
       if (err.message === 'NotFound') next(new NotFoundError(INVALID_CARD));
