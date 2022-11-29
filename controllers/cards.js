@@ -32,12 +32,12 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findById(req.params.cardId)
+  Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
+      Card.remove(req.params.cardId);
       if (!card) {
         throw new NotFoundError(INVALID_CARD);
       }
-      Card.remove(req.params.cardId);
       res.send({ data: card });
     }).catch((err) => {
       if (err.name === 'CastError') {
