@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const URL_REG_ESP = require('../constants');
+const isURL = require('validator/lib/isURL');
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -14,8 +14,8 @@ const cardSchema = new mongoose.Schema({
       type: String,
       required: [true, 'Поле "link" должно быть заполнено'],
       validate: {
-        validator: (v) => URL_REG_ESP.test(v),
-        message: 'Поле "link" должно быть валидным url-адресом.',
+        validator: (v) => isURL(v),
+        message: 'Неправильный формат ссылки',
       },
     },
   },
