@@ -1,7 +1,9 @@
 class DoubleEmailError extends Error {
-  constructor(message) {
-    super(message);
+  constructor() {
+    super();
+    this.message = 'Данный email уже зарегистрирован!';
     this.statusCode = 409;
+    this.name = 'DoubleEmailError';
   }
 }
 

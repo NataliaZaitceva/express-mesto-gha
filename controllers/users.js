@@ -22,7 +22,7 @@ module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email,
   } = req.body;
-  return bcrypt.hash(req.body.password, SALT_ROUND)
+  bcrypt.hash(req.body.password, SALT_ROUND)
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
@@ -30,10 +30,9 @@ module.exports.createUser = (req, res, next) => {
       name: user.name, about: user.about, avatar: user.avatar, email: user.email, _id: user._id,
     }))
     .catch((err) => {
+      if (err.name === 'ValidationError') next(new BadRequest('Ошибка'));
       if (err.code === 11000) {
-        next(new DoubleEmailError('Такой email уже существует.'));
-      } if (err.name === 'ValidationError') {
-        next(new BadRequest('Ошибка'));
+        next(new DoubleEmailError());
       }
       next(err);
     });
