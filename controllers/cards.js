@@ -34,17 +34,14 @@ module.exports.createCard = (req, res, next) => {
 module.exports.deleteCard = (req, res, next) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
-      Card.remove(req.params.cardId);
       if ((!card.owner.equals(req.user._id))) {
-        throw new NotFoundError(INVALID_CARD);
+        throw new ForbiddenError(INVALID_CARD);
+      } else {
+        Card.deleteOne(req.params.cardId)
+          .then(() => res.send({ data: card }));
       }
-      res.send({ data: card });
-    }).catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequest(INVALID_ID));
-      }
-      next(err);
-    });
+    })
+    .catch(next);
 };
 
 module.exports.likeCard = (req, res, next) => {
