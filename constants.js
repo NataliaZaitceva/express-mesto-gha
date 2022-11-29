@@ -10,7 +10,7 @@ const ERROR_CODE_INTERNAL = 500;
 const ERROR_DATA = 403;
 const DOUBLE_EMAIL_ERROR = 403;
 
-const URL_REG_ESP = /^(https?:\/\/)?([\da-z.-]+).([a-z.]{2,6})([/\w.-]*)*\/?$/img;
+const URL_REG_ESP = /^((https?:)(\/\/\/?)([\w]*(?::[\w]*)?@)?([\d\w\\.-]+)(?::(\d+))?)?([/\w\\.()-]*)?(?:([?][^#]*)?(#.*)?)*/img;
 
 module.exports = {
   SERVER_ERROR,
