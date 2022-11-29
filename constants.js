@@ -9,7 +9,8 @@ const ERROR_CODE_NOT_FOUND = 404;
 const ERROR_CODE_INTERNAL = 500;
 const ERROR_DATA = 403;
 const DOUBLE_EMAIL_ERROR = 403;
-const AVATAR_REGEX = /^:?https?:\/\/(www\.)?[a-zA-Z\d-]+\.[\w\d\-.~:/?#[\]@!$&'()*+,;=]{2,}#?$/;
+
+const URL_REG_ESP = /^((https?:)(\/\/\/?)([\w]*(?::[\w]*)?@)?([\d\w\\.-]+)(?::(\d+))?)?([/\w\\.()-]*)?(?:([?][^#]*)?(#.*)?)*/img;
 
 module.exports = {
   SERVER_ERROR,
@@ -21,6 +22,6 @@ module.exports = {
   ERROR_CODE_NOT_FOUND,
   ERROR_CODE_INTERNAL,
   ERROR_DATA,
-  AVATAR_REGEX,
+  URL_REG_ESP,
   DOUBLE_EMAIL_ERROR,
 };

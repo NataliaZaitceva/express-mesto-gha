@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const { celebrate, Joi } = require('celebrate');
 const { errors } = require('celebrate');
 const { login, createUser } = require('./controllers/users');
-const { AVATAR_REGEX } = require('./constants');
+const URL_REG_ESP = require('./constants');
 // Слушаем 3000 порт
 const PORT = 3000;
 const app = express();
@@ -25,7 +25,7 @@ app.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).default('Жак-Ив Кусто'),
     about: Joi.string().min(2).max(30).default('Исследователь'),
-    avatar: Joi.string().pattern(AVATAR_REGEX).default('https//pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png'),
+    avatar: Joi.string().regex(RegExp(URL_REG_ESP)).default('https//pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png'),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),

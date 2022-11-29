@@ -3,7 +3,7 @@ const { celebrate, Joi } = require('celebrate');
 const {
   getUsers, getUserById, updateAvatar, updateProfile, getUserInfo, getCurrentUser,
 } = require('../controllers/users');
-const { AVATAR_REGEX } = require('../constants');
+const URL_REG_ESP = require('../constants');
 
 router.get('/', getUsers);
 router.get('/me', getCurrentUser);
@@ -24,7 +24,7 @@ router.patch('/me', celebrate({
 
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required().pattern(AVATAR_REGEX),
+    avatar: Joi.string().required().regex(RegExp(URL_REG_ESP)),
   }),
 }), updateAvatar);
 
