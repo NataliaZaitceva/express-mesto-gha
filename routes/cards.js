@@ -9,7 +9,7 @@ router.get('/', getCards);
 router.post('/', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().regex(RegExp(URL_REG_ESP)),
+    link: Joi.string().required().pattern(RegExp(URL_REG_ESP)),
   }),
 }), createCard);
 router.delete('/:cardId', celebrate({
