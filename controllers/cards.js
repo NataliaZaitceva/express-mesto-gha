@@ -6,7 +6,7 @@ const {
 } = require('../constants');
 const BadRequest = require('../Errors/BadRequest'); // 400
 const NotFoundError = require('../Errors/NotFoundError'); // 404
-
+const ForbiddenError = require('../Errors/ForbiddenError');
 const Card = require('../models/card');
 
 module.exports.getCards = (req, res) => {
@@ -35,18 +35,18 @@ module.exports.deleteCard = (req, res, next) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (!card) {
-        throw new NotFoundError(INVALID_CARD);
+        throw new ForbiddenError(INVALID_CARD);
       }
       Card.deleteOne(req.params.cardId);
       res.send({ data: card });
     }).catch((err) => {
       if (err.message === 'NotFound') {
-        return next(new NotFoundError(INVALID_CARD));
+        next(new NotFoundError(INVALID_CARD));
       }
       if (err.name === 'CastError') {
-        return next(new BadRequest(INVALID_ID));
+        next(new BadRequest(INVALID_ID));
       }
-      return next(err);
+      next(err);
     });
 };
 
