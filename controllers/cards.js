@@ -32,13 +32,13 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findById(req.params.cardId)
     .then((card) => {
       if ((!card.owner.equals(req.user._id))) {
-        throw new ForbiddenError(INVALID_CARD);
+        next(new ForbiddenError(INVALID_CARD));
       } else {
-        Card.deleteOne(req.params.cardId)
-          .then(() => res.send({ data: card }));
+        Card.deleteOne({ card })
+          .then(() => res.send({ message: 'Карточка удалена' }));
       }
     })
     .catch(next);
