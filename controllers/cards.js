@@ -35,16 +35,13 @@ module.exports.deleteCard = (req, res, next) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (!card) {
-        throw new ForbiddenError(INVALID_CARD);
+        throw new NotFoundError(INVALID_CARD);
       }
       Card.deleteOne(req.params.cardId);
       res.send({ data: card });
     }).catch((err) => {
-      if (err.message === 'NotFound') {
-        next(new NotFoundError(INVALID_CARD));
-      }
       if (err.name === 'CastError') {
-        next(new BadRequest(INVALID_ID));
+        next(new ForbiddenError(INVALID_ID));
       }
       next(err);
     });
