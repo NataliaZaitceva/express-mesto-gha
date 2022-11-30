@@ -1,7 +1,3 @@
-const {
-  INVALID_CARD,
-  INVALID_ID,
-} = require('../constants');
 const BadRequest = require('../Errors/BadRequest'); // 400
 const NotFoundError = require('../Errors/NotFoundError'); // 404
 const ForbiddenError = require('../Errors/ForbiddenError');
@@ -32,7 +28,7 @@ module.exports.deleteCard = (req, res, next) => {
     .orFail(() => new NotFoundError(' ID карточки не существует'))
     .then((card) => {
       if ((!card.owner.equals(req.user._id))) {
-        next(new ForbiddenError(INVALID_CARD));
+        next(new ForbiddenError('Переданы некорректные данные'));
       } else {
         Card.deleteOne({ card })
           .then(() => res.send({ message: 'Карточка удалена' }))
@@ -68,12 +64,12 @@ module.exports.dislikeCard = (req, res, next) => {
   )
     .then((cards) => {
       if (!cards) {
-        throw new NotFoundError(INVALID_CARD);
+        throw new NotFoundError('Передан несуществующий _id карточки');
       }
       res.send({ data: cards });
     })
     .catch((err) => {
-      if (err.name === 'CastError') next(new BadRequest(INVALID_ID));
+      if (err.name === 'CastError') next(new BadRequest('Переданы некорректные данные'));
       next(err);
     });
 };
