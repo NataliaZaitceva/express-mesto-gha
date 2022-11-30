@@ -1,20 +1,16 @@
 const {
-  SERVER_ERROR,
   INVALID_CARD,
   INVALID_ID,
-  ERROR_CODE_INTERNAL,
 } = require('../constants');
 const BadRequest = require('../Errors/BadRequest'); // 400
 const NotFoundError = require('../Errors/NotFoundError'); // 404
 const ForbiddenError = require('../Errors/ForbiddenError');
 const Card = require('../models/card');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch(() => {
-      res.status(ERROR_CODE_INTERNAL).send({ SERVER_ERROR });
-    });
+    .catch(next);
 };
 
 module.exports.createCard = (req, res, next) => {
@@ -24,7 +20,7 @@ module.exports.createCard = (req, res, next) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequest({ message: `${Object.values(err.errors).map((error) => error.message).join(', ')}` }));
+        next(new BadRequest('Переданы некорректные данные при создании карточки'));
       } else {
         next(err);
       }
@@ -39,7 +35,8 @@ module.exports.deleteCard = (req, res, next) => {
         next(new ForbiddenError(INVALID_CARD));
       } else {
         Card.deleteOne({ card })
-          .then(() => res.send({ message: 'Карточка удалена' }));
+          .then(() => res.send({ message: 'Карточка удалена' }))
+          .catch(next);
       }
     })
     .catch(next);
@@ -53,13 +50,12 @@ module.exports.likeCard = (req, res, next) => {
   )
     .then((cards) => {
       if (!cards) {
-        throw new NotFoundError(INVALID_CARD);
+        throw new NotFoundError('Передан несуществующий _id карточки');
       }
       res.send({ data: cards });
     })
     .catch((err) => {
-      if (err.message === 'NotFound') next(new NotFoundError(INVALID_CARD));
-      if (err.name === 'CastError') next(new BadRequest(INVALID_ID));
+      if (err.name === 'CastError') next(new BadRequest('Переданы некорректные данные'));
       next(err);
     });
 };
