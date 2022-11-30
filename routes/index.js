@@ -3,7 +3,7 @@ const { celebrate, Joi } = require('celebrate');
 const { login, createUser } = require('../controllers/users');
 const auth = require('../middlewares/auth');
 const NotFoundError = require('../Errors/NotFoundError');
-const URL_REG_ESP = require('../constants');
+const { urlRegExp } = require('../constants');
 
 router.post('/signin', celebrate({
   body: Joi.object().keys({
@@ -16,7 +16,7 @@ router.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().regex(RegExp(URL_REG_ESP)),
+    avatar: Joi.string().regex(urlRegExp),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),
