@@ -6,7 +6,6 @@ const BadRequest = require('../Errors/BadRequest');
 const DoubleEmailError = require('../Errors/DoubleEmailError');
 const NotFoundError = require('../Errors/NotFoundError');
 const AuthError = require('../Errors/AuthError');
-const Unauthorized = require('../Errors/Unauthorized');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -44,7 +43,7 @@ module.exports.login = (req, res, next) => {
       }
       return bcrypt.compare(password, user.password, (error, hash) => {
         if (!hash) {
-          return next(new Unauthorized('Что-то пошло не так '));
+          return next(new AuthError('Неправильная почта или пароль'));
         }
         const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
         return res
